@@ -7,7 +7,7 @@ import ot.plot
 
 
 class BertForMultiLabelClassification(BertPreTrainedModel):
-    def __init__(self, config, entreg=0.1):
+    def __init__(self, config):
         super().__init__(config)
         self.num_labels = config.num_labels
 
@@ -15,17 +15,9 @@ class BertForMultiLabelClassification(BertPreTrainedModel):
         self.dropout = nn.Dropout(config.hidden_dropout_prob)
         self.classifier = nn.Linear(config.hidden_size, self.config.num_labels)
         self.weight = nn.Linear(self.config.num_labels,1)
-        # self.loss_fct = nn.BCEWithLogitsLoss()
         self.init_weights()
-        # 计算一次代价矩阵
         self.M = compute_cost_matrix(hierarchy, leaf_labels)
         self.M_tensor = torch.tensor(self.M, dtype=torch.float32)  # 确保类型匹配
-        self.lamda1 = nn.Parameter(torch.rand(1) * 2 + 1)
-        self.lamda2 = nn.Parameter(torch.rand(1) * 2 + 1)
-        self.lamda1 = nn.Parameter(torch.rand(1) + 1)
-        self.lamda2 = nn.Parameter(torch.rand(1) + 1)
-        self.pre_1 = 0
-        self.pre_2 = 1
         self.softmax = nn.Softmax(dim=1)
         self.BCE = nn.BCEWithLogitsLoss()
 
@@ -52,8 +44,8 @@ class BertForMultiLabelClassification(BertPreTrainedModel):
         pooled_output = self.dropout(pooled_output)
         logits = self.classifier(pooled_output)
         logits_soft = self.softmax(logits)
-        #x = self.weight(logits)
-        #x = torch.sigmoid(x)
+        x = self.weight(logits)
+        x = torch.sigmoid(x)
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 
@@ -80,14 +72,9 @@ class BertForMultiLabelClassification(BertPreTrainedModel):
             average_loss = total_loss / batch_size  # 计算平均损失
             BCE_loss = self.BCE(logits, labels)
 
-            final_loss = (1.0 / (2.0 * self.lamda1 * self.lamda1) * self.pre_1 * average_loss) + (
-                    1.0 / (2.0 * self.lamda2 * self.lamda2) * self.pre_2 * BCE_loss) + torch.log(
-                self.lamda1 * self.lamda2)
-            """
             final_loss = BCE_loss *(1-x) + average_loss * x
-            """
+
             list = [final_loss, outputs, average_loss, BCE_loss]
-            #outputs = (final_loss,) + outputs  # 更新输出，包含平均损失
             outputs = list
 
         return outputs  # (loss), logits, (hidden_states), (attentions)
