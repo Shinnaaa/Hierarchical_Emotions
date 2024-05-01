@@ -26,37 +26,31 @@ def set_seed(args):
 
 def emd_compute(labels, logits):
     total_emd = 0
-    global M_tensor  # 确保 M_tensor 已初始化
-
-    # 将 labels 和 logits 转换为 tensor
+    global M_tensor 
     labels_tensor = torch.tensor(labels, dtype=torch.float32)
     logits_tensor = torch.tensor(logits, dtype=torch.float32)
-    batch_size = min(len(labels_tensor), len(logits_tensor))  # 确保 batch_size 不超出任一张量的大小
+    batch_size = min(len(labels_tensor), len(logits_tensor)) 
 
-    # 确保预测和真实标签的和相等
-    for i in range(batch_size):  # 确保不超出范围
+    for i in range(batch_size): 
         if i >= labels_tensor.size(0) or i >= logits_tensor.size(0):
             raise IndexError(f"Index {i} out of bounds")
 
-        # 对 labels 进行归一化，确保和为 1
         labels_sum = torch.sum(labels_tensor[i])
 
         if labels_sum > 0:
-            labels_tensor[i] = labels_tensor[i] / labels_sum  # 归一化
+            labels_tensor[i] = labels_tensor[i] / labels_sum  
         else:
-            labels_tensor[i] = torch.zeros_like(labels_tensor[i])  # 零和处理
+            labels_tensor[i] = torch.zeros_like(labels_tensor[i]) 
 
-    # 计算 EMD
     for i in range(batch_size):
         single_logit = logits_tensor[i]
         single_label = labels_tensor[i]
 
         if torch.sum(single_logit) > 0 and torch.sum(single_label) > 0:
-            # 使用 M_tensor 计算 EMD
             emd = ot.emd2(single_logit, single_label, M_tensor)
             total_emd += emd
 
-    final_emd = total_emd / batch_size  # 计算平均 EMD
+    final_emd = total_emd / batch_size  
     return final_emd
 
 def compute_metrics(labels, preds, logits=None):
@@ -77,7 +71,6 @@ def compute_metrics(labels, preds, logits=None):
         labels, preds, average="weighted", zero_division=0)
     results["hamming_loss"] = hamming_loss(labels, preds)
 
-    # 使用logits计算EMD
     results["emd"] = emd_compute(labels, logits)
 
     return results
