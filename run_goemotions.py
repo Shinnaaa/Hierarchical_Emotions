@@ -166,7 +166,7 @@ def train(args,
 
 global_logits = None
 def evaluate(args, model, eval_dataset, mode, global_step=None):
-    global global_logits  # 全局变量
+    global global_logits 
     results = {}
     eval_sampler = SequentialSampler(eval_dataset)
     eval_dataloader = DataLoader(eval_dataset, sampler=eval_sampler, batch_size=args.eval_batch_size)
@@ -203,7 +203,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
 
         softmax_logits = torch.softmax(logits, dim=1)
 
-        # 累积sigmoid处理后的logits
         if global_logits is None:
             global_logits = softmax_logits.detach().cpu().numpy()
         else:
@@ -218,12 +217,10 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             num_labels_per_sample = inputs["labels"].sum(dim=1).cpu().numpy()
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
-            # 对于每个后续批次，将softmax预测值附加到preds变量中
             if not isinstance(logits, torch.Tensor):
                 logits = logits[0]
             softmax_preds = torch.softmax(logits, dim=1).cpu().numpy()
             preds = np.append(preds, softmax_preds, axis=0)
-            # 累积标签数量和真实标签
             num_labels_per_sample = np.append(num_labels_per_sample, inputs["labels"].sum(dim=1).cpu().numpy(), axis=0)
             out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
@@ -231,16 +228,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     results = {
         "loss": eval_loss
     }
-
-    """
-    threshold = .3
-    new_preds = preds.copy()
-    pos_index = new_preds > threshold
-    neg_index = new_preds < threshold
-    new_preds[pos_index] = 1
-    new_preds[neg_index] = 0
-    result = compute_metrics(out_label_ids, new_preds)
-    """
 
     new_preds = np.zeros_like(preds)
     for i, num_labels in enumerate(num_labels_per_sample):
@@ -251,7 +238,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     result = compute_metrics(out_label_ids, new_preds, global_logits)
 
     results.update(result)
-    # input(result)
 
     output_dir = os.path.join(args.output_dir, mode)
     if not os.path.exists(output_dir):
