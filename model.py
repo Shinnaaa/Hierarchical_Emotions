@@ -17,7 +17,7 @@ class BertForMultiLabelClassification(BertPreTrainedModel):
         self.weight = nn.Linear(self.config.num_labels,1)
         self.init_weights()
         self.M = compute_cost_matrix(hierarchy, leaf_labels)
-        self.M_tensor = torch.tensor(self.M, dtype=torch.float32)  # 确保类型匹配
+        self.M_tensor = torch.tensor(self.M, dtype=torch.float32) 
         self.softmax = nn.Softmax(dim=1)
         self.BCE = nn.BCEWithLogitsLoss()
 
@@ -53,23 +53,20 @@ class BertForMultiLabelClassification(BertPreTrainedModel):
         assert len(outputs) < 3
 
         if labels is not None:
-            total_loss = torch.tensor(0.0).to(device)  # 初始化总损失为0
-            batch_size = logits_soft.size(0)  # 获取批次大小
+            total_loss = torch.tensor(0.0).to(device) 
+            batch_size = logits_soft.size(0) 
 
             for i in range(batch_size):
-                # 获取单个批次中的预测和真实标签
                 single_logits_soft = logits_soft[i]
                 single_label = labels[i]
 
-                # 归一化处理，使所有项和为1
-                if single_label.sum() > 0:  # 防止除以0
+                if single_label.sum() > 0: 
                     single_label = single_label / single_label.sum()
 
-                # 计算单个样本的 OT 损失
                 loss = ot.emd2(single_logits_soft, single_label, self.M_tensor)
-                total_loss += loss  # 累加损失
+                total_loss += loss  
 
-            average_loss = total_loss / batch_size  # 计算平均损失
+            average_loss = total_loss / batch_size 
             BCE_loss = self.BCE(logits, labels)
 
             final_loss = BCE_loss *(1-x) + average_loss * x
