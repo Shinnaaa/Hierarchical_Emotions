@@ -195,8 +195,9 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 "labels": batch[3]
             }
             outputs = model(**inputs)
-            tmp_eval_loss, logits = outputs[:2]
-            logits = logits[0]
+            tmp_eval_loss, logits_tuple = outputs[:2]
+            # Extract logits from tuple: outputs[1] is (logits,) + outputs[2:]
+            logits = logits_tuple[0] if isinstance(logits_tuple, tuple) else logits_tuple
 
             eval_loss += tmp_eval_loss.mean().item()
         nb_eval_steps += 1
@@ -209,16 +210,11 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             global_logits = np.append(global_logits, softmax_logits.detach().cpu().numpy(), axis=0)
 
         if preds is None:
-            if not isinstance(logits, torch.Tensor):
-                logits = logits[0]
             softmax_preds = torch.softmax(logits, dim=1).cpu().numpy()
-            # softmax_preds = 1 / (1 + np.exp(-logits.detach().cpu().numpy()))
             preds = softmax_preds
             num_labels_per_sample = inputs["labels"].sum(dim=1).cpu().numpy()
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
-            if not isinstance(logits, torch.Tensor):
-                logits = logits[0]
             softmax_preds = torch.softmax(logits, dim=1).cpu().numpy()
             preds = np.append(preds, softmax_preds, axis=0)
             num_labels_per_sample = np.append(num_labels_per_sample, inputs["labels"].sum(dim=1).cpu().numpy(), axis=0)

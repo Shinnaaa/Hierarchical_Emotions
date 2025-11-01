@@ -3,6 +3,16 @@ import ot
 import numpy as np
 
 def hierarchy_path(hierarchy, label):
+    """
+    Get the path from a label to the root of the hierarchy.
+    
+    Args:
+        hierarchy: Dictionary mapping child labels to parent labels
+        label: Starting label
+    
+    Returns:
+        List of labels from the given label to the root
+    """
     path = [label]
     while label in hierarchy:
         label = hierarchy[label]
@@ -10,6 +20,20 @@ def hierarchy_path(hierarchy, label):
     return path
 
 def hierarchy_distance(hierarchy, label1, label2):
+    """
+    Compute the distance between two labels in the hierarchy.
+    
+    The distance is defined as the sum of steps from each label
+    to their nearest common ancestor.
+    
+    Args:
+        hierarchy: Dictionary mapping child labels to parent labels
+        label1: First label
+        label2: Second label
+    
+    Returns:
+        Integer distance between the two labels
+    """
     path1 = hierarchy_path(hierarchy, label1)
     path2 = hierarchy_path(hierarchy, label2)
 
@@ -18,6 +42,20 @@ def hierarchy_distance(hierarchy, label1, label2):
     return common_ancestor_distance
 
 def compute_cost_matrix(hierarchy, leaf_labels):
+    """
+    Compute the cost matrix for Earth Mover's Distance based on hierarchical structure.
+    
+    The cost matrix encodes the semantic distance between emotions based on their
+    position in the emotion hierarchy. This is used in the EMD loss function to
+    penalize predictions that are semantically distant from the ground truth.
+    
+    Args:
+        hierarchy: Dictionary mapping child labels to parent labels
+        leaf_labels: List of leaf node labels (emotion classes)
+    
+    Returns:
+        2D list representing the cost matrix between all pairs of labels
+    """
     num_labels = len(leaf_labels)
     cost_matrix = [[0 for _ in range(num_labels)] for _ in range(num_labels)]
     for i in range(num_labels):
@@ -27,6 +65,9 @@ def compute_cost_matrix(hierarchy, leaf_labels):
             cost_matrix[j][i] = distance
     return cost_matrix
 
+# Hierarchical structure of emotions
+# Maps each emotion to its parent in the hierarchy tree
+# Structure: Root -> Level 2 (positive/negative/ambiguous/neutral) -> Level 3 (emotion groups) -> Level 4 (specific emotions)
 hierarchy = {
     "admiration": "joy_lev2",
     "amusement": "joy_lev2",
@@ -67,6 +108,7 @@ hierarchy = {
     "neutral": "Root"
 }
 
+# List of leaf node labels (the 28 emotion classes used for classification)
 leaf_labels = ["admiration", "amusement", "anger_lev3", "surprise_lev3", "annoyance", "approval", "caring", "confusion",
                "curiosity", "desire", "disappointment", "disapproval", "disgust_lev3", "embarrassment", "excitement",
                "fear_lev3", "gratitude", "grief", "joy_lev3", "love", "nervousness", "optimism", "pride", "realization",
