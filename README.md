@@ -251,14 +251,16 @@ This allows the model to learn that predicting `amusement` when the true label i
 
 ## Citation
 
-If you use this code, please cite the original GoEmotions paper:
+If you use this code, please cite:
 
 ```bibtex
-@article{demszky2020goemotions,
-  title={GoEmotions: A Dataset of Fine-Grained Emotions},
-  author={Demszky, Dorottya and Movshovitz-Attias, Dana and Ko, Jeongwoo and Cowen, Alan and Nemade, Gaurav and Ravi, Shashank},
-  journal={arXiv preprint arXiv:2005.00547},
-  year={2020}
+@inproceedings{yu2025emotional,
+  title={Emotional Earth Mover’s Distance for Fine-Grained Hierarchical Emotion Analysis},
+  author={Yu, Hai-Tao and Li, Dawei and Kang, Xin},
+  booktitle={International Conference on Advanced Data Mining and Applications},
+  pages={296--310},
+  year={2025},
+  organization={Springer}
 }
 ```
 
