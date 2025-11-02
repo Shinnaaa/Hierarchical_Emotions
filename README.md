@@ -1,4 +1,4 @@
-# Hierarchical Emotions Classification with BERT and Earth Mover's Distance
+# Emotional Earth Mover’s Distance for Fine-Grained Hierarchical Emotion Analysis
 
 A neural approach to fine-grained emotion classification that leverages hierarchical emotion structures through Earth Mover's Distance (EMD) loss. This work improves upon Google's GoEmotions dataset and model by incorporating semantic relationships between emotions through a hierarchical cost matrix.
 
