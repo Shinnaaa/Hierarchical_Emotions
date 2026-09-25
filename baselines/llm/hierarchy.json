@@ -1,0 +1,163 @@
+{
+    "root": {
+        "children": [
+            {
+                "label": "positive",
+                "children": [
+                    {
+                        "label": "joy_lev2",
+                        "children": [
+                            {
+                                "label": "admiration",
+                                "children": []
+                            },
+                            {
+                                "label": "amusement",
+                                "children": []
+                            },
+                            {
+                                "label": "approval",
+                                "children": []
+                            },
+                            {
+                                "label": "caring",
+                                "children": []
+                            },
+                            {
+                                "label": "desire",
+                                "children": []
+                            },
+                            {
+                                "label": "excitement",
+                                "children": []
+                            },
+                            {
+                                "label": "gratitude",
+                                "children": []
+                            },
+                            {
+                                "label": "joy_lev3",
+                                "children": []
+                            },
+                            {
+                                "label": "love",
+                                "children": []
+                            },
+                            {
+                                "label": "optimism",
+                                "children": []
+                            },
+                            {
+                                "label": "pride",
+                                "children": []
+                            },
+                            {
+                                "label": "relief",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "label": "negative",
+                "children": [
+                    {
+                        "label": "anger_lev2",
+                        "children": [
+                            {
+                                "label": "anger_lev3",
+                                "children": []
+                            },
+                            {
+                                "label": "annoyance",
+                                "children": []
+                            },
+                            {
+                                "label": "disapproval",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "label": "sadness_lev2",
+                        "children": [
+                            {
+                                "label": "disappointment",
+                                "children": []
+                            },
+                            {
+                                "label": "embarrassment",
+                                "children": []
+                            },
+                            {
+                                "label": "grief",
+                                "children": []
+                            },
+                            {
+                                "label": "remorse",
+                                "children": []
+                            },
+                            {
+                                "label": "sadness_lev3",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "label": "disgust_lev2",
+                        "children": [
+                            {
+                                "label": "disgust_lev3",
+                                "children": []
+                            }
+                        ]
+                    },
+                    {
+                        "label": "fear_lev2",
+                        "children": [
+                            {
+                                "label": "fear_lev3",
+                                "children": []
+                            },
+                            {
+                                "label": "nervousness",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "label": "ambiguous",
+                "children": [
+                    {
+                        "label": "surprise_lev2",
+                        "children": [
+                            {
+                                "label": "confusion",
+                                "children": []
+                            },
+                            {
+                                "label": "curiosity",
+                                "children": []
+                            },
+                            {
+                                "label": "realization",
+                                "children": []
+                            },
+                            {
+                                "label": "surprise_lev3",
+                                "children": []
+                            }
+                        ]
+                    }
+                ]
+            },
+            {
+                "label": "neutral",
+                "children": []
+            }
+        ]
+    }
+}
