@@ -1,0 +1,12 @@
+__pycache__/
+*.pyc
+.env
+# Training outputs
+ckpt/
+bert-base-cased-goemotions-*/
+runs/
+data/original/cached_*
+baselines/bert/ckpt/
+baselines/bert/bert-base-cased-goemotions-*/
+baselines/bert/runs/
+baselines/llm/gpt_responses.txt

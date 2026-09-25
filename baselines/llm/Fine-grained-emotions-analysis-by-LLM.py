@@ -7,6 +7,12 @@ import numpy as np
 import ot
 from tqdm import tqdm
 import json
+import os
+from pathlib import Path
+
+# Paths are relative to this file, so the script runs from any directory.
+HERE = Path(__file__).resolve().parent
+DATA_DIR = HERE.parent.parent / "data" / "original"   # shared GoEmotions split
 
 def normalize_rows(arr):
     row_sums = np.sum(arr, axis=1, keepdims=True)
@@ -30,7 +36,9 @@ def emd_compute(labels, preds):
     final_emd = total_emd / len(preds_normalized)
     return final_emd
 
-client = OpenAI(api_key='your api key')
+# The paper's runs used gpt-3.5-turbo; set OPENAI_MODEL to try another model.
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+MODEL = os.getenv("OPENAI_MODEL", "gpt-3.5-turbo")
 M = compute_cost_matrix(hierarchy, leaf_labels)
 M = np.array(M)
 
@@ -39,8 +47,8 @@ def read_labels(file_path):
         labels = [line.strip() for line in file.readlines()]
     return {label: i for i, label in enumerate(labels)}
 
-labels_mapping = read_labels('labels.txt')
-with open("hierarchy.json", "r") as file:
+labels_mapping = read_labels(DATA_DIR / 'labels.txt')
+with open(HERE / "hierarchy.json", "r") as file:
     hierarchical_structure = json.load(file)
 
 def read_dataset(file_path):
@@ -48,9 +56,9 @@ def read_dataset(file_path):
     df.columns = ['Text', 'Labels', 'Index']  
     return df
 
-train_df = read_dataset('train.tsv')
-dev_df = read_dataset('dev.tsv')
-test_df = read_dataset('test.tsv')
+train_df = read_dataset(DATA_DIR / 'train.tsv')
+dev_df = read_dataset(DATA_DIR / 'dev.tsv')
+test_df = read_dataset(DATA_DIR / 'test.tsv')
 
 batch_size = 170
 random_seed = 42
@@ -97,7 +105,7 @@ def create_prompt(text, labels_detail):
 def classify_text(text, labels_detail, output_file):
     try:
         prompt = create_prompt(text, labels_detail)
-        response = client.chat.completions.create(model="gpt-3.5-turbo",
+        response = client.chat.completions.create(model=MODEL,
                                                   messages=[{"role": "system", "content": prompt}])
         response_text = response.choices[0].message.content
 
@@ -129,7 +137,7 @@ def compute_batch_result(y_np_pred_binary, y_np_true_binary):
     return result_dict
 
 mlb = MultiLabelBinarizer()
-output_file = "gpt_responses.txt"
+output_file = HERE / "gpt_responses.txt"
 predicted_results = []
 batch_predicted_results = []
 batch_true_results = []

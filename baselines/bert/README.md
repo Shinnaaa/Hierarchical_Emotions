@@ -1,41 +1,28 @@
-# GoEmotions Pytorch
+# Baseline: BERT fine-tuned with BCE
 
-This is a Pytorch Implementation of [GoEmotions](https://github.com/google-research/google-research/tree/master/goemotions) with [Huggingface Transformers](https://github.com/huggingface/transformers) 
+The fine-tuned baseline of the paper: BERT (`bert-base-cased`) for 28-label GoEmotions classification, trained with binary cross-entropy only. It is [monologg/GoEmotions-pytorch](https://github.com/monologg/GoEmotions-pytorch) with one addition: evaluation also reports the **EMD** metric with the hierarchical cost matrix (`cost_matric.py`), so the baseline is scored exactly like the proposed method in the repository root.
 
-We added some new matrix in it, to make a in-depth comparison with our method.
+This folder was merged from the former `Shinnaaa/GoEmotions-baseline` fork with its full history; the upstream code and its Apache-2.0 [license](LICENSE) are kept.
 
-## What is GoEmotions
+## Run
 
-Dataset labeled **58000 Reddit comments** with **28 emotions**
-
-- admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise + neutral
-
-### Requirements
-
-- torch==1.4.0
-- transformers==2.11.0
-- attrdict==2.0.1
-
-### Hyperparameters
-
-You can change the parameters from the json files in `config` directory.
-
-| Parameter         |      |
-| ----------------- | ---: |
-| Learning rate     | 5e-5 |
-| Warmup proportion |  0.1 |
-| Epochs            |   10 |
-| Max Seq Length    |   50 |
-| Batch size        |   16 |
-
-## How to Run
+Run from this folder. The config reads the shared dataset in `../../data/original`.
 
 ```bash
-$ python3 run_goemotions.py --taxonomy original
+cd baselines/bert
+pip install -r requirements.txt
+python run_goemotions.py --taxonomy original
 ```
 
-## Reference
+Checkpoints go to `ckpt/original/`; evaluation prints accuracy, micro/macro/weighted F1, Hamming loss and EMD.
 
-- [GoEmotions](https://github.com/google-research/google-research/tree/master/goemotions)
-- [GoEmotions Github](https://github.com/google-research/google-research/tree/master/goemotions)
-- [Huggingface Transformers](https://github.com/huggingface/transformers)
+## Differences from upstream
+
+| File | Change |
+|---|---|
+| `cost_matric.py` | New: emotion hierarchy and the label-to-label cost matrix |
+| `utils.py` | `compute_metrics` adds Hamming loss and EMD over sigmoid outputs |
+| `run_goemotions.py` | Collects sigmoid outputs during evaluation and passes them to the metrics |
+| `config/original.json` | `data_dir` points to the shared `../../data/original` |
+
+Hyperparameters (in `config/original.json`) match upstream: learning rate 5e-5, batch size 16, 10 epochs, max sequence length 50, warmup 0.1, threshold 0.3.

@@ -1,6 +1,6 @@
 {
   "task": "goemotions",
-  "data_dir": "data/original",
+  "data_dir": "../../data/original",
   "ckpt_dir": "ckpt/original",
   "output_dir": "bert-base-cased-goemotions-original",
   "train_file": "train.tsv",

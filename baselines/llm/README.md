@@ -38,15 +38,14 @@ Required packages:
 ## Project Structure
 
 ```
-.
+baselines/llm/
 ├── Fine-grained-emotions-analysis-by-LLM.py  # Main script
 ├── cost_matrix.py                             # Hierarchical cost matrix computation
-├── hierarchy.json                             # Emotion hierarchy structure
-├── labels.txt                                 # Emotion label mappings
-├── train.tsv                                  # Training dataset (required)
-├── dev.tsv                                    # Development dataset (required)
-├── test.tsv                                   # Test dataset (required)
+├── hierarchy.json                             # Emotion hierarchy given to the model in the prompt
 └── README.md                                  # This file
+
+../../data/original/                           # Shared with the rest of the repository
+├── labels.txt, train.tsv, dev.tsv, test.tsv
 ```
 
 ## Dataset Format
@@ -64,49 +63,21 @@ This is disappointing	10	2
 
 ## Setup
 
-1. **Clone or download this repository**
+This folder was merged from the former `Shinnaaa/Fine-grained-emotions-analysis-by-LLM` repository with its history. It reads the shared GoEmotions split in `../../data/original/`, so no data needs to be copied.
 
-2. **Install dependencies** (see Requirements section above)
-
-3. **Configure OpenAI API Key**:
-   Edit `Fine-grained-emotions-analysis-by-LLM.py` and replace `'your api key'` on line 33 with your actual OpenAI API key:
-   ```python
-   client = OpenAI(api_key='your-api-key-here')
-   ```
-   
-   Alternatively, you can set it as an environment variable for better security.
-
-4. **Prepare your datasets**:
-   Ensure that `train.tsv`, `dev.tsv`, and `test.tsv` files are present in the project directory.
+1. Install the dependencies (see Requirements above).
+2. Set your API key: `export OPENAI_API_KEY=sk-...`
+   Optional: `export OPENAI_MODEL=...` (default `gpt-3.5-turbo`, as used in the paper) and `OPENAI_BASE_URL` for another OpenAI-compatible endpoint.
 
 ## Usage
 
-1. **Configure the target dataset**:
-   By default, the script processes the development set (`dev_df`). To use the test set, modify line 112:
-   ```python
-   dataset_to_predict = test_df  # Change from dev_df to test_df
-   ```
+```bash
+python baselines/llm/Fine-grained-emotions-analysis-by-LLM.py   # from any directory
+```
 
-2. **Adjust batch size** (optional):
-   Modify the `batch_size` variable on line 55 to control evaluation batch size (default: 170).
-
-3. **Run the script**:
-   ```bash
-   python Fine-grained-emotions-analysis-by-LLM.py
-   ```
-
-4. **Monitor progress**:
-   The script displays a progress bar and prints evaluation metrics after each batch:
-   - Accuracy
-   - Micro F1 Score
-   - Macro F1 Score
-   - Weighted F1 Score
-   - Hamming Loss
-   - EMD (Earth Mover's Distance)
-
-5. **Review outputs**:
-   - LLM responses are saved to `gpt_responses.txt`
-   - Evaluation metrics are printed to console
+- The script classifies every example of the **dev** split (5,426 texts, one API call each) and prints the metrics after every `batch_size` (170) examples: accuracy, micro/macro/weighted F1, Hamming loss and EMD.
+- Raw model answers are appended to `gpt_responses.txt` next to the script.
+- To evaluate the test split instead, replace `dev_df` with `test_df` in the evaluation loop and in the `mlb.fit_transform(...)` line near the end (the `dataset_to_predict` variable is not used by the loop).
 
 ## Evaluation Metrics
 
@@ -124,16 +95,13 @@ This is disappointing	10	2
 ## Customization
 
 ### Changing the LLM Model
-To use a different OpenAI model (e.g., GPT-4-turbo), modify line 100 in `Fine-grained-emotions-analysis-by-LLM.py`:
-```python
-response = client.chat.completions.create(model="gpt-4-turbo", ...)
-```
+Set the `OPENAI_MODEL` environment variable, e.g. `export OPENAI_MODEL=gpt-4o`. With `OPENAI_BASE_URL` you can also point the script at any OpenAI-compatible provider.
 
 ### Modifying Emotion Labels
-Edit `labels.txt` to add, remove, or modify emotion categories. Ensure that the `hierarchy.json` file is updated accordingly to reflect the hierarchical relationships.
+Edit `../../data/original/labels.txt` to add, remove, or modify emotion categories (this changes them for the whole repository). Ensure that the `hierarchy.json` file is updated accordingly to reflect the hierarchical relationships.
 
 ### Adjusting the Prompt
-Customize the classification prompt by modifying the `create_prompt()` function (lines 72-95) to change the reasoning approach or examples.
+Customize the classification prompt by modifying the `create_prompt()` function to change the reasoning approach or examples.
 
 ## Notes
 
