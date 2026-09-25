@@ -1,9 +1,3 @@
-<p align="center">
-  <a href="README.md"><img alt="English" src="https://img.shields.io/badge/English-1f2328?style=for-the-badge"></a>
-  <a href="docs/README.zh-CN.md"><img alt="简体中文" src="https://img.shields.io/badge/%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87-eaeef2?style=for-the-badge"></a>
-  <a href="docs/README.ja.md"><img alt="日本語" src="https://img.shields.io/badge/%E6%97%A5%E6%9C%AC%E8%AA%9E-eaeef2?style=for-the-badge"></a>
-</p>
-
 # Emotional Earth Mover’s Distance for Fine-Grained Hierarchical Emotion Analysis
 
 <p>
@@ -26,7 +20,13 @@ Fine-grained emotion labels are not independent: predicting *amusement* for a *j
 | [`baselines/llm/`](baselines/llm) | Chain-of-thought prompting of an LLM (gpt-3.5-turbo), scored with the same metrics | LLM baseline |
 | [`data/original/`](data/original) | GoEmotions train/dev/test split with 28 labels, shared by all three | Dataset |
 
-All three report micro/macro/weighted F1, accuracy, Hamming loss and EMD on the same split, so their numbers are directly comparable. The results are in the paper.
+All three use the same GoEmotions split in `data/original/` and report the same metrics: micro/macro/weighted F1, accuracy, Hamming loss and EMD, with the same hierarchical cost matrix. They turn model output into predicted labels differently:
+
+- **Repository root:** softmax over the 28 labels; for each example, the *k* most probable labels are predicted, where *k* is that example's number of gold labels. EMD is computed on the softmax distribution.
+- **`baselines/bert/`:** sigmoid per label; a label is predicted when its probability exceeds `threshold` (0.3 in the config). EMD is computed on the sigmoid probabilities normalised to sum to 1.
+- **`baselines/llm/`:** the labels named in the model's final answer; EMD is computed on those binary predictions normalised to sum to 1. The script scores the dev set by default (`dataset_to_predict`) and prints metrics per batch.
+
+Keep these differences in mind when comparing numbers across the three. The results are in the paper.
 
 ## Reproduce
 
